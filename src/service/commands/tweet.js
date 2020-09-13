@@ -1,5 +1,8 @@
 const Any = require('../../api/models/any.model');
+const { tweetsList } = require('../utils/tweets');
+const { puppet } = require('../utils/puppet');
 
+//statuses/show/:id
 async function run(params, botHelper) {
   try {
     const tgChan = process.env.TWCH;
@@ -20,14 +23,21 @@ async function run(params, botHelper) {
     if (item) {
       item = item.toObject();
       id = item.id;
-    }
-    if (item) {
+      const id_str = item.id_str;
+      const s = await puppet(`https://twitter.com/${twUser}/status/${id_str}`);
+      //console.log(s);
+      if (s && s.text) {
+        item.text = s.text;
+      } else {
+        //const tweet = await tweetsList('', id);
+        //console.log(tweet);
+      }
       await Promise.all([
         AnyM.bulkWrite([
           {
             updateOne: {
               filter: { id },
-              update: { posted: true },
+              update: { posted: params.test ? false : true },
               upsert: true,
             },
           },
