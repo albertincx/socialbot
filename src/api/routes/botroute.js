@@ -12,7 +12,6 @@ let startCnt = parseInt(fs.readFileSync('count.txt'), 10);
 
 module.exports = (bot, conn) => {
   const botHelper = new BotHelper(bot.telegram);
-  console.log(conn)
   if (conn) conn.on('error', (err) => {
     botHelper.disDb();
   });
@@ -44,13 +43,18 @@ module.exports = (bot, conn) => {
 
   bot.command('cleardb', ({ message, reply }) => {
     if (botHelper.isAdmin(message.chat.id)) {
-      return db.clear(message).then(r => reply(r).catch(e => botHelper.sendError(e)));
+      return db.clear(message).then(
+        r => reply(r).catch(e => botHelper.sendError(e)));
     }
   });
 
-  bot.command('srv', ({ message, update }) => {
-    // console.log(message);
-    // console.log(update);
+  bot.command('srv', ({ message, update, ...query }) => {
+    console.log(message);
+    console.log(update);
+    if (!message) {
+      message = update.channel_post;
+      message.from = message.chat;
+    }
     if (message && botHelper.isAdmin(message.from.id)) {
       botHelper.sendAdmin(`srv: ${JSON.stringify(message)}`);
     }
