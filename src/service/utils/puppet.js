@@ -29,7 +29,7 @@ async function puppet(url, ws) {
         const uid = url.match(/tion\/([0-9]+).json/)[1];
         // console.log(interceptedRequest.url(), Object.keys(interceptedRequest));
         const json = await response.json();
-        console.log(json);
+        // console.log(json);
         // const varvar = json.globalObjects.tweets[uid].extended_entities.media[0].video_info.variants;
         const full_text = json.globalObjects.tweets[uid].full_text;
         test = { text: full_text };

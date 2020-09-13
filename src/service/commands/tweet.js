@@ -24,13 +24,18 @@ async function run(params, botHelper) {
       item = item.toObject();
       id = item.id;
       const id_str = item.id_str;
-      const s = await puppet(`https://twitter.com/${twUser}/status/${id_str}`, botHelper.browserWs);
+      //console.log(botHelper.browserWs);
+      let s = {};
+      /*if (botHelper.browserWs) s = await puppet(
+        `https://twitter.com/${twUser}/status/${id_str}`, botHelper.browserWs);*/
       //console.log(s);
       if (s && s.text) {
         item.text = s.text;
-      } else {
-        //const tweet = await tweetsList('', id);
-        //console.log(tweet);
+      }
+      const tweet = await tweetsList('', id_str);
+      //console.log(tweet);
+      if (tweet) {
+        item.text = tweet.full_text;
       }
       await Promise.all([
         AnyM.bulkWrite([

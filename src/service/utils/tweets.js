@@ -25,7 +25,7 @@ function tweetsList(username, since_id = false) {
     }
     let url = 'https://api.twitter.com/1.1/statuses/';
     if (!username && since_id) {
-      url += 'show.json?id=' + since_id;
+      url += 'show.json?tweet_mode=extended&id=' + since_id;
     } else {
       url += 'user_timeline.json?' + params.join('&');
     }
