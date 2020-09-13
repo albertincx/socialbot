@@ -5,7 +5,7 @@ const FILESLAVE = process.env.FILESLAVE;
 const TASKS_CHANNEL = process.env.TASKS_DEV || 'tasks';
 
 const TASKS2_CHANNEL = process.env.TASKS2_DEV || 'tasks2';
-const TASKS3_CHANNEL = process.env.TASKSPUPPET_DEV || 'puppet';
+const TASKS3_CHANNEL = process.env.TASKSPUPPET_DEV;
 const FILES_CHANNEL = process.env.FILESCHAN_DEV || 'files';
 let rchannel = null;
 const starts = {

@@ -1,8 +1,7 @@
 const puppeteer = require('puppeteer');
-const fetch = require('node-fetch');
 
-async function puppet(url) {
-  const browser = await puppeteer.launch();
+async function puppet(url, ws) {
+  const browser = await puppeteer.connect({ browserWSEndpoint: ws });
   const page = await browser.newPage();
   await page.setRequestInterception(true);
   let ab = false;

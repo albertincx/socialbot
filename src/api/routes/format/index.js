@@ -6,8 +6,6 @@ const db = require('../../utils/db');
 const rabbitmq = require('../../../service/rabbitmq');
 rabbitmq.createChannel();
 
-
-
 const support = ({ message, reply }, botHelper) => {
   let system = JSON.stringify(message.from);
   try {
@@ -37,17 +35,24 @@ const startOrHelp = ({ message, reply }, botHelper) => {
   }
   botHelper.sendAdmin(system);
 };
-const broadcast = ({ message: msg, reply }, botHelper) => {
+const cmd = ({ message: msg, reply }, botHelper) => {
   const { chat: { id: chatId }, text } = msg;
   const isAdm = botHelper.isAdmin(chatId);
-  if (isAdm) {
-    return db.processBroadcast(text, reply, botHelper);
+  let command = text.match(/cmd (.*?)$/);
+  if (isAdm && command) {
+    command = command[1];
+    try {
+      const cmd = require(process.cwd() + `/src/service/commands/${command}`);
+      cmd.run({test: true}, botHelper);
+    } catch (e) {
+      console.log('module not found');
+    }
   }
 };
 module.exports = (bot, botHelper) => {
   bot.command(['/start', '/help'], ctx => startOrHelp(ctx, botHelper));
-  bot.command(['/createBroadcast', '/startBroadcast'],
-    ctx => broadcast(ctx, botHelper));
+  bot.command(['/cmd'],
+    ctx => cmd(ctx, botHelper));
   bot.hears('👋 Help', ctx => startOrHelp(ctx, botHelper));
   bot.hears('👍Support', ctx => support(ctx, botHelper));
   bot.command('support', ctx => support(ctx, botHelper));

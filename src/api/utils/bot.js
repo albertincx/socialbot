@@ -52,7 +52,7 @@ class BotHelper {
     if (contentSelector) {
       params.content = contentSelector;
     }
-    const puppetOnly = force === 'puppet' || this.getConf(`${hostname}_puppet`);
+    const puppetOnly = this.getConf(`${hostname}_puppet`);
     if (puppetOnly) {
       params.isPuppet = true;
     }
