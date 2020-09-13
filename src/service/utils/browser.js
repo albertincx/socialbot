@@ -1,5 +1,5 @@
 const puppeteer = require('puppeteer');
-const logger = require('../utils/logger');
+const logger = require('./logger');
 
 const getBrowser = async () => {
   const args = [
