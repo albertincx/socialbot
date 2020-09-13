@@ -15,7 +15,7 @@ async function run(params, botHelper) {
         $or: [{ posted: false }, { posted: { $exists: false } }],
       },
       '',
-      { sort: { id: -1 } });
+      { sort: { id: 1 } });
     let id = false;
     if (item) {
       item = item.toObject();
