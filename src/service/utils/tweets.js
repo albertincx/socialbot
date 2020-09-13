@@ -23,8 +23,13 @@ function tweetsList(username, since_id = false) {
     if (since_id) {
       params.push(`since_id=${since_id}`);
     }
-    const url = 'https://api.twitter.com/1.1/statuses/user_timeline.json?';
-    oauth.get(url + params.join('&'), AT, AST, function(e, data, result) {
+    let url = 'https://api.twitter.com/1.1/statuses/';
+    if (!username && since_id) {
+      url += 'show.json?id=' + since_id;
+    } else {
+      url += 'user_timeline.json?' + params.join('&');
+    }
+    oauth.get(url, AT, AST, function(e, data, result) {
       if (e) {
         reject(e);
         return;
