@@ -52,10 +52,6 @@ class BotHelper {
     if (contentSelector) {
       params.content = contentSelector;
     }
-    const puppetOnly = this.getConf(`${hostname}_puppet`);
-    if (puppetOnly) {
-      params.isPuppet = true;
-    }
     const customOnly = force === 'custom' || this.getConf(`${hostname}_custom`);
     if (customOnly) {
       params.isCustom = true;
@@ -83,9 +79,6 @@ class BotHelper {
       params.content = this.getConf('pcache_content');
     }
     if (this.isAdmin(chatId)) {
-      if (this.getConf('test_puppet')) {
-        params.isPuppet = true;
-      }
       if (this.getConf('test_custom')) {
         params.isCustom = true;
       }

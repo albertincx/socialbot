@@ -1,6 +1,5 @@
 const Any = require('../../api/models/any.model');
 const { tweetsList } = require('../utils/tweets');
-const { puppet } = require('../utils/puppet');
 
 //statuses/show/:id
 async function run(params, botHelper) {
