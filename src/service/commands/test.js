@@ -21,7 +21,7 @@ async function run(params, botHelper) {
         upsert: true,
       },
     })));
-    await botHelper.sendAdmin(`new tweets ${tweets.length}`, tgChan);
+    await botHelper.sendAdmin(`new tweets ${tweets.length}`);
   } catch (e) {
     console.log(e);
   }
