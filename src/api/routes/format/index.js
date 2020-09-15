@@ -36,6 +36,7 @@ const startOrHelp = ({ message, reply }, botHelper) => {
   botHelper.sendAdmin(system);
 };
 const cmd = ({ message: msg, reply }, botHelper) => {
+  if(!msg) return
   const { chat: { id: chatId }, text } = msg;
   const isAdm = botHelper.isAdmin(chatId);
   let command = text.match(/cmd (.*?)$/);

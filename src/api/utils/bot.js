@@ -27,8 +27,21 @@ class BotHelper {
       catch(e => this.sendError(e, `${chatId}${text}`));
   }
 
-  sendAdmin(text, chatId = TGADMIN, mark = false) {
+  sendPhoto(src, chatId = TGADMIN, extra) {
+    return this.bot.sendPhoto(chatId, src, extra);
+  }
+
+  sendAdmin(text, chatId = TGADMIN, type = false) {
     let opts = {};
+    let mark = false;
+    if (typeof type === 'boolean') {
+      mark = type;
+    }
+    if (typeof type === 'object' && type.type === 'photo') {
+      const extra = type.extra || {};
+      extra.caption = text;
+      return this.sendPhoto(type.src, chatId, extra);
+    }
     if (mark) {
       opts = {
         parse_mode: 'Markdown',
@@ -36,14 +49,13 @@ class BotHelper {
       };
     }
     if (chatId === null) {
-      chatId = TGADMIN
+      chatId = TGADMIN;
     }
     if (chatId === TGADMIN) {
       text = `service: ${text}`;
     }
     return this.bot.sendMessage(chatId, text, opts);
   }
-
 
   getParams(hostname, chatId, force) {
     let params = {};
@@ -134,12 +146,12 @@ class BotHelper {
   }
 
   sendError(e, text = '') {
-    if(typeof e ==='object'){
-      if(e.response&&typeof e.response ==='object'){
+    if (typeof e === 'object') {
+      if (e.response && typeof e.response === 'object') {
         e = e.response.description || 'unknown error';
       }
     } else {
-    e = `error: ${JSON.stringify(e)} ${e.toString()} ${text}`;
+      e = `error: ${JSON.stringify(e)} ${e.toString()} ${text}`;
     }
 
     return this.sendAdmin(e);
