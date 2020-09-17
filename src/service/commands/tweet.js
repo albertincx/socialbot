@@ -76,7 +76,7 @@ async function run(params, botHelper) {
           if (tweet.extended_entities) {
             const { vcap, vurl } = extendedEntities(tweet.extended_entities);
             videoCaption = vcap;
-            if (videoCaption) {
+            if (videoCaption && vurl) {
               item.text = item.text.replace(vurl, '');
             }
           }
