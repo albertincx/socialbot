@@ -13,7 +13,9 @@ if (!NOBOT && process.env.TBTKN) {
   const botInstance = require('./config/bot');
   if (botInstance) {
     const { router, bot } = botroute(botInstance, conn);
-    init(bot);
+    if (!process.env.DEV) {
+      init(bot);
+    }
     bot.setBlacklist(blacklistFile);
     app.use('/bot', router);
   }

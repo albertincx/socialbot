@@ -27,6 +27,10 @@ class BotHelper {
       catch(e => this.sendError(e, `${chatId}${text}`));
   }
 
+  sendVideo(src, chatId = TGADMIN, extra) {
+    return this.bot.sendVideo(chatId, src, extra);
+  }
+
   sendPhoto(src, chatId = TGADMIN, extra) {
     return this.bot.sendPhoto(chatId, src, extra);
   }
@@ -37,15 +41,21 @@ class BotHelper {
     if (typeof type === 'boolean') {
       mark = type;
     }
-    if (typeof type === 'object' && type.type === 'photo') {
-      const extra = type.extra || {};
-      extra.caption = text;
-      return this.sendPhoto(type.src, chatId, extra);
+    if (typeof type === 'object') {
+      if (type.type === 'photo') {
+        const extra = type.extra || {};
+        extra.caption = text;
+        return this.sendPhoto(type.src, chatId, extra);
+      }
+      if (type.type === 'video') {
+        const extra = type.extra || {};
+        extra.caption = text;
+        return this.sendVideo(type.src, chatId, extra);
+      }
     }
     if (mark) {
       opts = {
         parse_mode: 'Markdown',
-        disable_web_page_preview: true,
       };
     }
     if (chatId === null) {
