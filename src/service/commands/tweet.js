@@ -5,8 +5,8 @@ function extendedEntities(extended_entities) {
   let vcap = { vcap: false };
   if (extended_entities.media && extended_entities.media.length) {
     if (extended_entities.media[0]) {
-      if (extended_entities.media[0]) {
-        const variants = extended_entities.media[0].video_info.variants;
+      if (extended_entities.media[0] && extended_entities.media[0].video_info) {
+        const variants = extended_entities.media[0].video_info.variants || [];
         let url = '';
         if (Array.isArray(variants)) {
           let d = 0;
@@ -18,7 +18,6 @@ function extendedEntities(extended_entities) {
               }
             }
           }
-
         }
         if (url) {
           vcap.vcap = url;
