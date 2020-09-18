@@ -123,6 +123,7 @@ async function run(params, botHelper) {
       await botHelper.sendAdmin(`new tweet ${id}`);
     }
   } catch (e) {
+    botHelper.sendAdmin(`srv: ${JSON.stringify(e)}`, process.env.TGGROUPBUGS);
     console.log(e);
   }
 }
