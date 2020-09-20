@@ -1,13 +1,11 @@
 const Any = require('../../api/models/any.model');
 const { tweetsList } = require('../utils/tweets');
 
-async function run(params, botHelper) {
+async function run() {
   try {
     const tgChan = process.env.TWCH;
     const twUser = process.env.TWUS;
-    if (!tgChan || !twUser) {
-      return;
-    }
+    if (!tgChan || !twUser) return;
     const AnyM = Any.collection.conn.model('twitts', Any.schema);
     const items = await AnyM.findOne({ id: { $exists: true } }, '',
       { sort: { id: -1 } });
@@ -21,7 +19,6 @@ async function run(params, botHelper) {
         upsert: true,
       },
     })));
-    await botHelper.sendAdmin(`new tweets ${tweets.length}`);
   } catch (e) {
     console.log(e);
   }

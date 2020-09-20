@@ -2,9 +2,6 @@ const messages = require('../../../messages/format');
 const logger = require('../../utils/logger');
 const keyboards = require('./keyboards');
 
-const rabbitmq = require('../../../service/rabbitmq');
-rabbitmq.createChannel();
-
 const support = ({ message, reply }, botHelper) => {
   let system = JSON.stringify(message.from);
   try {
