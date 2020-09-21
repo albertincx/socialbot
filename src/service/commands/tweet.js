@@ -85,7 +85,7 @@ async function run(params, botHelper) {
             const display_url = tweet.entities.urls[0].display_url;
             const expanded_url = tweet.entities.urls[0].expanded_url;
             // item.text = item.text.replace(url,            `[${display_url}](${expanded_url})`);
-            // item.text = item.text.replace(url, expanded_url);
+            item.text = item.text.replace(url, expanded_url);
             if (item.text.match(/[^\r\n]http(.*?)$/)) {
               item.text = item.text.replace('https', '\r\nhttps');
             }
