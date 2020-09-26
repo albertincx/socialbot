@@ -2,7 +2,8 @@ const Any = require('../../api/models/any.model');
 const { tweetsList } = require('../utils/tweets');
 
 function extendedEntities(extended_entities) {
-  let vcap = { vcap: false };
+  let vcap = { vcap: false, group: [] };
+  let mediaGroup = [];
   if (extended_entities.media && extended_entities.media.length) {
     if (extended_entities.media[0]) {
       if (extended_entities.media[0] && extended_entities.media[0].video_info) {
@@ -23,8 +24,20 @@ function extendedEntities(extended_entities) {
           vcap.vcap = url;
           vcap.vurl = extended_entities.media[0].url;
         }
+      } else {
+        for (let vi = 0; vi < extended_entities.media.length; vi += 1) {
+          if ('photo' === extended_entities.media[vi].type) {
+            mediaGroup.push({
+              type: 'photo',
+              media: extended_entities.media[vi].media_url_https,
+            });
+          }
+        }
       }
     }
+  }
+  if (mediaGroup.length > 1) {
+    vcap.group = mediaGroup;
   }
   return vcap;
 }
@@ -72,9 +85,14 @@ async function run(params, botHelper) {
           if (tweet.entities.user_mentions) item.text = userMentions(item.text,
             tweet.entities.user_mentions);
           let videoCaption = false;
+          let mediaGroup = [];
           if (tweet.extended_entities) {
-            const { vcap, vurl } = extendedEntities(tweet.extended_entities);
+            const { vcap, vurl, group } = extendedEntities(
+              tweet.extended_entities);
             videoCaption = vcap;
+            if (group) {
+              mediaGroup = group;
+            }
             if (videoCaption && vurl) {
               item.text = item.text.replace(vurl, '');
             }
@@ -108,6 +126,13 @@ async function run(params, botHelper) {
               type: 'video',
               src: videoCaption,
             };
+          } else {
+            if (Array.isArray(mediaGroup) && mediaGroup.length) {
+              type = {
+                type: 'photos',
+                src: mediaGroup,
+              };
+            }
           }
         }
       }
