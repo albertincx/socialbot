@@ -70,14 +70,23 @@ async function run(params, botHelper) {
     if (item) {
       item = item.toObject();
       id = item.id;
+      const exists = await AnyM.findOne({ id, posted: true });
+      if (exists) return false;
+      await AnyM.bulkWrite([
+        {
+          updateOne: {
+            filter: { id },
+            update: { posted: params.test ? false : true },
+            upsert: true,
+          },
+        },
+      ]);
       const id_str = item.id_str;
       let s = {};
-      if (s && s.text) {
-        item.text = s.text;
-      }
+      if (s && s.text) item.text = s.text;
       const tweet = await tweetsList('', id_str);
       let type = false;
-      //console.log(JSON.stringify(tweet, null, 2));
+      // console.log(JSON.stringify(tweet, null, 2));
       if (tweet) {
         item.text = tweet.full_text;
         let mark = false;
@@ -100,7 +109,7 @@ async function run(params, botHelper) {
           if (tweet.entities.urls &&
             tweet.entities.urls.length === 1) {
             const url = tweet.entities.urls[0].url;
-            const display_url = tweet.entities.urls[0].display_url;
+            // const display_url = tweet.entities.urls[0].display_url;
             const expanded_url = tweet.entities.urls[0].expanded_url;
             // item.text = item.text.replace(url,            `[${display_url}](${expanded_url})`);
             item.text = item.text.replace(url, expanded_url);
@@ -136,19 +145,12 @@ async function run(params, botHelper) {
           }
         }
       }
-      await Promise.all([
-        AnyM.bulkWrite([
-          {
-            updateOne: {
-              filter: { id },
-              update: { posted: params.test ? false : true },
-              upsert: true,
-            },
-          },
-        ]),
-        botHelper.sendAdmin(item.text, tgChan, type),
-      ]).catch(e => botHelper.sendAdmin(JSON.stringify(e)));
-      await botHelper.sendAdmin(`new tweet ${id}`);
+      let errStr = '';
+      await botHelper.sendAdmin(item.text, tgChan, type).catch(e => {
+        errStr += JSON.stringify(e);
+      });
+      const s2 = `new tweet ${id} ${errStr ? `with err ${errStr}` : ''}`;
+      await botHelper.sendAdmin(s2);
     }
   } catch (e) {
     botHelper.sendAdmin(`srv: ${JSON.stringify(e)}`, process.env.TGGROUPBUGS);
