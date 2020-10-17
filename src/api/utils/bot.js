@@ -36,11 +36,10 @@ class BotHelper {
   }
 
   sendPhotos(src, chatId = TGADMIN, extra = {}) {
-    //console.log(chatId, src, extra);
-    return this.bot.sendMediaGroup(chatId, src, extra).then(e=>{
-      console.log(e)
-    }).catch((e)=>{
-      console.log(e)
+    return this.bot.sendMediaGroup(chatId, src, extra).then(e => {
+      console.log(e);
+    }).catch((e) => {
+      console.log(e);
     });
   }
 
@@ -57,7 +56,7 @@ class BotHelper {
         return this.sendPhoto(type.src, chatId, extra);
       }
       if (type.type === 'photos') {
-        type.src[0].caption = text
+        type.src[0].caption = text;
         return this.sendPhotos(type.src, chatId);
       }
       if (type.type === 'video') {

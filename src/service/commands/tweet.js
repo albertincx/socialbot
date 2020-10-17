@@ -1,60 +1,11 @@
 const Any = require('../../api/models/any.model');
-const { tweetsList } = require('../utils/tweets');
-
-function extendedEntities(extended_entities) {
-  let vcap = { vcap: false, group: [] };
-  let mediaGroup = [];
-  if (extended_entities.media && extended_entities.media.length) {
-    if (extended_entities.media[0]) {
-      if (extended_entities.media[0] && extended_entities.media[0].video_info) {
-        const variants = extended_entities.media[0].video_info.variants || [];
-        let url = '';
-        if (Array.isArray(variants)) {
-          let d = 0;
-          for (let vi = 0; vi < variants.length; vi += 1) {
-            if ('video/mp4' === variants[vi].content_type) {
-              if (d < variants[vi].bitrate) {
-                d = variants[vi].bitrate;
-                url = variants[vi].url;
-              }
-            }
-          }
-        }
-        if (url) {
-          vcap.vcap = url;
-          vcap.vurl = extended_entities.media[0].url;
-        }
-      } else {
-        for (let vi = 0; vi < extended_entities.media.length; vi += 1) {
-          if ('photo' === extended_entities.media[vi].type) {
-            mediaGroup.push({
-              type: 'photo',
-              media: extended_entities.media[vi].media_url_https,
-            });
-          }
-        }
-      }
-    }
-  }
-  if (mediaGroup.length > 1) {
-    vcap.group = mediaGroup;
-  }
-  return vcap;
-}
-
-function userMentions(text, user_mentions) {
-  if (user_mentions && user_mentions.length) {
-    for (let i = 0; i < user_mentions.length; i += 1) {
-      text = text.replace(new RegExp(`@${user_mentions[i].screen_name}`),
-        `https://twitter.com/${user_mentions[i].screen_name}`);
-    }
-  }
-  return text;
-}
+const { tweet } = require('../utils/tweet');
 
 async function run(params, botHelper) {
   try {
-    const tgChan = process.env.TWCH;
+    let tgChan = process.env.TWCH;
+    let isModer = process.env.ISMODER;
+    if (isModer) tgChan = process.env.TWUSMODER;
     const twUser = process.env.TWUS;
     if (!tgChan || !twUser) return;
     const AnyM = Any.collection.conn.model('twitts', Any.schema);
@@ -84,68 +35,17 @@ async function run(params, botHelper) {
       const id_str = item.id_str;
       let s = {};
       if (s && s.text) item.text = s.text;
-      const tweet = await tweetsList('', id_str);
+      let { itemText, itemType } = await tweet(id_str);
       let type = false;
-      // console.log(JSON.stringify(tweet, null, 2));
-      if (tweet) {
-        item.text = tweet.full_text;
-        let mark = false;
-        if (tweet.entities) {
-          if (tweet.entities.user_mentions) item.text = userMentions(item.text,
-            tweet.entities.user_mentions);
-          let videoCaption = false;
-          let mediaGroup = [];
-          if (tweet.extended_entities) {
-            const { vcap, vurl, group } = extendedEntities(
-              tweet.extended_entities);
-            videoCaption = vcap;
-            if (group) {
-              mediaGroup = group;
-            }
-            if (videoCaption && vurl) {
-              item.text = item.text.replace(vurl, '');
-            }
-          }
-          if (tweet.entities.urls &&
-            tweet.entities.urls.length === 1) {
-            const url = tweet.entities.urls[0].url;
-            // const display_url = tweet.entities.urls[0].display_url;
-            const expanded_url = tweet.entities.urls[0].expanded_url;
-            // item.text = item.text.replace(url,            `[${display_url}](${expanded_url})`);
-            item.text = item.text.replace(url, expanded_url);
-            if (item.text.match(/[^\r\n]http(.*?)$/)) {
-              item.text = item.text.replace('https', '\r\nhttps');
-            }
-            // type = true;
-          }
-          if (tweet.entities.media &&
-            tweet.entities.media.length === 1 &&
-            tweet.entities.media[0].type ===
-            'photo' && !videoCaption) {
-            item.text = item.text.replace(tweet.entities.media[0].url, '');
-            mark = type;
-            type = {
-              type: 'photo',
-              src: tweet.entities.media[0].media_url_https,
-            };
-            if (mark) type.extra = { parse_mode: 'Markdown' };
-          }
-          if (videoCaption) {
-            type = {
-              type: 'video',
-              src: videoCaption,
-            };
-          } else {
-            if (Array.isArray(mediaGroup) && mediaGroup.length) {
-              type = {
-                type: 'photos',
-                src: mediaGroup,
-              };
-            }
-          }
-        }
+      if (itemText) {
+        item.text = itemText;
+        type = itemType;
       }
       let errStr = '';
+      if (isModer) {
+        item.text = `❗️Модерация\n\n${item.text}
+        \n/postTweet_${id_str} Нажмите сюда чтобы опубликовать`;
+      }
       await botHelper.sendAdmin(item.text, tgChan, type).catch(e => {
         errStr += JSON.stringify(e);
       });
