@@ -82,7 +82,7 @@ module.exports = (bot, botHelper) => {
   bot.hears('👍Support', ctx => support(ctx, botHelper));
   bot.command('support', ctx => support(ctx, botHelper));
   bot.hears(/^\/postTweet_(.*?)/, async ({ message, reply }) => {
-    let tw = message.text.match(/postTweet_([0-9a-zA-Z]+)@/);
+    let tw = message.text.match(/postTweet_([0-9a-zA-Z]+)/);
     let errStr = '';
     if (tw) {
       try {
